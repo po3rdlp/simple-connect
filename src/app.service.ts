@@ -1,8 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable , HttpException, HttpStatus} from '@nestjs/common';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'THIS IS STILL ON DEVELOPMENT, ON LOCALHOST.\n SOMEONE WHO SEE THIS, LOVE YOU.';
+  async getPing(): Promise<string> {
+    const setError = false
+    if (setError) {
+      throw new HttpException('BAD REQUEST', HttpStatus.BAD_REQUEST)
+    } else {
+      throw new HttpException('Successfully Connected', HttpStatus.ACCEPTED);
+    }
   }
 }

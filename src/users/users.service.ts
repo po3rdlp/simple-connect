@@ -46,6 +46,7 @@ export class UsersService {
     if(!user) {
       throw new NotFoundException(`User dengan id ${id} tidak di temukan`)
     }
+    console.warn(`Berhasil Mengambil ID ${id}`);
     return user
   }
 
@@ -71,14 +72,16 @@ export class UsersService {
   async update(id:number, UpdateUserDto: UpdateUserDto): Promise<{message: string, user: User}>{
     const user = await this.userRepository.findOne({where: {id}})
     if(!user) {
-      throw new NotFoundException(`User dengan id ${id} tidak di temukan`)
+      const err = new NotFoundException(`User dengan id ${id} tidak di temukan`)
+      console.warn(err)
+      throw err;
     }
     if('age' in UpdateUserDto){
       throw new BadRequestException('Age cannot be changed!');
     }
 
     const updateUser = Object.assign(user, UpdateUserDto)
-    await this.userRepository.save(updateUser);
+    await this.userRepository.save(updateUser);;
     return {
       message: `User dengan id ${id} berhasil di Update`,
       user: updateUser
