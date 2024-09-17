@@ -1,9 +1,9 @@
-import { ConflictException, Injectable, NotFoundException, HttpStatus, BadRequestException  } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, HttpStatus, BadRequestException, InternalServerErrorException  } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
@@ -53,7 +53,7 @@ export class UsersService {
   // service find by age
   async findAllByAge(age: number): Promise<{message: string; user: User[]}> {
     try{
-      const user = await this.userRepository.find({ where: {age} });
+      const user = await this.userRepository.find({ where: { age } });
 
       if (user.length === 0) {
         return {message: `No users found with this ${age}`, user: []}
@@ -63,8 +63,8 @@ export class UsersService {
           user: user
         }
       }
-    } catch(err){
-      console.log('by age',err)
+    } catch(error){
+      throw new InternalServerErrorException('Terjadi Kesalahan');
     }
   }
 
@@ -89,7 +89,7 @@ export class UsersService {
   }
 
   // service delete by id
- async remove(id: number, ): Promise<{ message: string; user: User }>{
+ async remove(id: number ): Promise<{ message: string; user: User }>{
     const user = await this.userRepository.findOneBy({ id: Number(id) });
     if(!user) {
       throw new NotFoundException(`User dengan id ${id} tidak di temukan, gagal menghapus.`)

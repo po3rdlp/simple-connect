@@ -26,7 +26,11 @@ export class UsersController {
 
   @Get('age')
   async findAllByAge(@Query('age') age: number): Promise<{message: string; user: User[]}> {
-    return this.usersService.findAllByAge(age);
+    try {
+      return this.usersService.findAllByAge(age);
+    } catch (error) {
+      console.log('ewoioioi', error);
+    }
   }
 
 
