@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, Query} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, Query, ParseIntPipe} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import  { User } from './entities/user.entity';
@@ -10,7 +10,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) : Promise<{ message: string; user: User }> {
+  create(@Body() createUserDto: CreateUserDto) : Promise<{ message: string; hint: string; user: User }> {
     return this.usersService.create(createUserDto);
   }
 
@@ -24,15 +24,24 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
-  @Get('age')
-  async findAllByAge(@Query('age') age: number): Promise<{message: string; user: User[]}> {
+  @Get(':id/password-check')
+  async findOnePasswordById(@Param('id') id :number, @Query('password') password: string): Promise<{message: string}> {
+    return this.usersService.findOnePasswordById(id ,password)
+  }
+
+  @Get('user-name/:userName')
+  async findOneUserName(@Param('userName') userName: string) {
+    return this.usersService.findOneUserName(userName);
+  }
+
+  @Get('age/:age')
+  async findAllByAge(@Param('age', ParseIntPipe) age: number): Promise<{message: string; user: User[]}> {
     try {
       return this.usersService.findAllByAge(age);
     } catch (error) {
       console.log('ewoioioi', error);
     }
   }
-
 
   @Patch(':id')
   async update(@Param('id')id : number, @Body() UpdateUserDto: UpdateUserDto) : Promise<{message: string; user: User}> {

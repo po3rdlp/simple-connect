@@ -3,7 +3,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
+import { hashPassword, comparePasswords } from '../lib/bcrypt';
 import { QueryFailedError, Repository } from 'typeorm';
+import { UserRole } from './enum/user-role.enum';
 
 @Injectable()
 export class UsersService {
@@ -14,17 +16,49 @@ export class UsersService {
   ) {}
 
   // service create User
-  async create(createUserDto: CreateUserDto): Promise<{message: string, user: User}> {
+  async create(createUserDto: CreateUserDto): Promise<{message: string,hint: string , user: User}> {
+
+    const missingFields = [];
+
+    if (!createUserDto.userName) missingFields.push('userName');
+    if (!createUserDto.firstName) missingFields.push('firstName');
+    if (!createUserDto.lastName) missingFields.push('lastName');
+    if (createUserDto.age === undefined) missingFields.push('age');
+    if (!createUserDto.password) missingFields.push('password');
+    if (!createUserDto.role) missingFields.push('role');
+  
+    if (missingFields.length > 0) {
+      throw new BadRequestException(`Field tidak terisi: ${missingFields.join(', ')}`);
+    }
+
+    const validRoles = Object.values(UserRole);
+    if (!validRoles.includes(createUserDto.role)) {
+    throw new BadRequestException(`Role tidak valid: ${createUserDto.role}`);
+  }
+
     const duplicateUser = await this.userRepository.findOneBy({ 
       firstName: createUserDto.firstName, 
       lastName: createUserDto.lastName,
     });
-    if (duplicateUser) {
-      throw new ConflictException(`User dengan firstName ${createUserDto.firstName} dan lastName ${createUserDto.lastName} sudah ada`);
+
+    const duplicateUserName = await this.userRepository.findOneBy({
+      userName: createUserDto.userName
+    })
+
+    if (duplicateUser || duplicateUserName) {
+      throw new ConflictException(`Gagal, UserName: ${createUserDto.userName} sudah ada. Atau firstName dan LastName Sama.`);
     }
-    const newUser = this.userRepository.create(createUserDto)
+
+    const hashedPassword = await hashPassword(createUserDto.password, createUserDto.age);
+
+    // create with hass pass
+    const newUser = this.userRepository.create({
+      ...createUserDto,
+      password: hashedPassword,
+    });
+
     await this.userRepository.save(newUser);
-    return {message: 'Berhasil Menambahkan User', user: newUser}
+    return {message: 'Berhasil Menambahkan User', hint: '', user: newUser}
   }
 
   // service find all user
@@ -50,9 +84,51 @@ export class UsersService {
     return user
   }
 
+  // find by username
+  async findOneUserName(userName: string): Promise<{ message: string; user: User }> {
+    if (!userName) {
+      throw new BadRequestException('Mohon Mengisi Username');
+    }
+
+    // Temukan pengguna berdasarkan userName
+    const user = await this.userRepository.findOne({ where: { userName } });
+
+    if (!user) {
+      throw new NotFoundException('Username tidak ditemukan');
+    }
+
+    return { message: 'Berhasil', user };
+  }
+
+
+  // check Passowrd
+  async findOnePasswordById(id: number, password: string): Promise<{message: string; user: User}> {
+    if (!password) {
+      throw new BadRequestException('Parameter Password diperlukan.');
+    }
+
+    const user = await this.userRepository.findOneBy({id: Number(id)});
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    const checkTruePassword = await comparePasswords(password, user.password , user.age);
+
+
+    if (!checkTruePassword) {
+      throw new BadRequestException(`Password yang di input tidak Valid, User Id: ${id}, User Name: ${user.userName}`)
+    }
+
+    return {message: 'Passowrd Valid', user}
+  }
+
   // service find by age
   async findAllByAge(age: number): Promise<{message: string; user: User[]}> {
     try{
+      if(isNaN(age)) {
+        throw new BadRequestException('Age Must integer.')
+      }
       const user = await this.userRepository.find({ where: { age } });
 
       if (user.length === 0) {
