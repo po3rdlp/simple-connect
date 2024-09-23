@@ -30,11 +30,11 @@ export class AuthGuard implements CanActivate {
         })
     } catch( error ) {
         throw new UnauthorizedException('Token tidak valid');
-    }
+    }3
 
     request['User'] = payload;
 
-    if (payload.role === UserRole.SUPER_ADMIN ) {
+    if (payload.role === UserRole.SUPER_ADMIN || payload.role === UserRole.ADMIN ) {
       console.log(payload);
       return true;
     }
