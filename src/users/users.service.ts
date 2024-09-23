@@ -1,10 +1,10 @@
-import { ConflictException, Injectable, NotFoundException, HttpStatus, BadRequestException, InternalServerErrorException  } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, HttpStatus, BadRequestException, InternalServerErrorException, UseGuards  } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { hashPassword, comparePasswords } from '../lib/bcrypt';
-import { QueryFailedError, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { UserRole } from './enum/user-role.enum';
 
 @Injectable()
