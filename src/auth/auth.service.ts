@@ -27,9 +27,20 @@ export class AuthService {
     const payLoad = { sub: user.user.id, username: user.user.userName, role: user.user.role};
 
     if (!isPasswordValid) {
+      console.log('salah password')
       throw new UnauthorizedException('Password yang dimasukan salah');
     } else {
       return {message: 'Login Successfully', access_token: await this.jwtService.signAsync(payLoad)};
+    }
+  }
+
+  async validateToken(token: string): Promise<{ message: string; user: any }> {
+    try {
+      const payload = await this.jwtService.verifyAsync(token);
+      const user = await this.userService.findOneUserName(payload.username);
+      return { message: 'Token is valid', user };
+    } catch (error) {
+      throw new UnauthorizedException('Token is invalid or expired');
     }
   }
 }

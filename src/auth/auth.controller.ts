@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Request, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 
@@ -10,5 +10,11 @@ export class AuthController {
   @Post('login')
   login(@Body() createAuthDto: CreateAuthDto): Promise<{message: string}> {
     return this.authService.login(createAuthDto);
+  }
+
+  @Get('validate-token')
+  async validateToken(@Request() req): Promise<{ message: string; user: any }> {
+    const token = req.headers['authorization']?.split(' ')[1];
+    return this.authService.validateToken(token);
   }
 }
