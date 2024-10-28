@@ -7,6 +7,7 @@ import { User } from './users/entities/user.entity';
 import { ProductsModule } from './products/products.module';
 import { Product } from './products/entities/product.entity';
 import { AuthModule } from './auth/auth.module';
+import { UserGateAway } from './gateAway/gateAway.service';
 
 @Module({
   imports: [
@@ -21,6 +22,6 @@ import { AuthModule } from './auth/auth.module';
       synchronize: true,
     }), UsersModule, ProductsModule, AuthModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, UserGateAway],
 })
 export class AppModule {}

@@ -5,9 +5,7 @@ import  { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '../auth/auth.guard';
 
-
 @Controller('users')
-@UseGuards(AuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -41,15 +39,17 @@ export class UsersController {
     try {
       return this.usersService.findAllByAge(age);
     } catch (error) {
-      console.log('ewoioioi', error);
+      console.log('Error', error);
     }
   }
 
+  @UseGuards(AuthGuard)
   @Patch(':id')
   async update(@Param('id')id : number, @Body() UpdateUserDto: UpdateUserDto) : Promise<{message: string; user: User}> {
     return this.usersService.update(id, UpdateUserDto)
   }
 
+  @UseGuards(AuthGuard)
   @Delete(':id')
   async remove(@Param('id') id: number) : Promise<{ message: string; user: User }> {
     return this.usersService.remove(id)

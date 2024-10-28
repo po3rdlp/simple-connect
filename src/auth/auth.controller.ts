@@ -13,7 +13,7 @@ export class AuthController {
   }
 
   @Get('validate-token')
-  async validateToken(@Request() req): Promise<{ message: string; user: any }> {
+  async validateToken(@Request() req): Promise<{ message: string; }> {
     const token = req.headers['authorization']?.split(' ')[1];
     return this.authService.validateToken(token);
   }
