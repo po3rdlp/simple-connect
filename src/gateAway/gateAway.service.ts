@@ -2,11 +2,13 @@ import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, OnGat
 import { Server, Socket } from 'socket.io';
 import { AuthService } from '../auth/auth.service';
 
-@WebSocketGateway({
+@WebSocketGateway( 3501, {
   cors: {
     origin: '*',
   },
 })
+
+
 export class UserGateAway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
