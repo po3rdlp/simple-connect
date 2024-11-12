@@ -8,6 +8,8 @@ import { ProductsModule } from './products/products.module';
 import { Product } from './products/entities/product.entity';
 import { AuthModule } from './auth/auth.module';
 import { UserGateAway } from './gateAway/gateAway.service';
+import { ChatModule } from './chat/chat.module';
+import { Chat } from './chat/entities/chat.entity';
 
 @Module({
   imports: [
@@ -18,9 +20,9 @@ import { UserGateAway } from './gateAway/gateAway.service';
       username: 'postgres',
       password: 'opkl5303',
       database: 'simple_connect',
-      entities: [User, Product],
+      entities: [User, Product, Chat],
       synchronize: true,
-    }), UsersModule, ProductsModule, AuthModule],
+    }), UsersModule, ProductsModule, AuthModule, ChatModule],
   controllers: [AppController],
   providers: [AppService, UserGateAway],
 })

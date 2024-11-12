@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 import { UserRole } from "../enum/user-role.enum";
+import { Chat } from "../../chat/entities/chat.entity";
 
 @Entity()
 export class User {
@@ -24,7 +25,13 @@ export class User {
     @Column({
         type: 'enum',
         enum: UserRole,
-        default: UserRole.USER, // Set a default role if needed
+        default: UserRole.USER,
       }) role: UserRole;
+
+      @OneToMany(() => Chat, (chat) => chat.sender)
+      sentMessages: Chat[];
+  
+      @OneToMany(() => Chat, (chat) => chat.receiver)
+      receivedMessages: Chat[];
 
 }
