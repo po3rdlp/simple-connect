@@ -9,7 +9,7 @@ import { jwtConstants } from './constants';
 import { UserGateAway } from '../gateAway/gateAway.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), UsersModule, JwtModule.register({global: true, secret: jwtConstants.secret, signOptions: { expiresIn: '600s' }}) ],
+  imports: [TypeOrmModule.forFeature([User]), UsersModule, JwtModule.register({global: true, secret: jwtConstants.secret, signOptions: { expiresIn: '3600s' }}) ],
   controllers: [AuthController],
   providers: [AuthService],
   exports: [AuthService]

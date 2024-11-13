@@ -40,6 +40,8 @@ export class UserGateAway implements OnGatewayInit, OnGatewayConnection, OnGatew
 
       console.log(`Client Connected, User: ${user.user.id}, Client ID: ${clientId}`);
       client.emit('client-id', { clientId });
+      console.log('Client-to-User Map:', this.clientToUserMap);
+      console.log('Client-to-UserName Map:', this.clientToUserNameMap);
 
       // Send the online status of users to the new client
       this.userOnlineStatus.forEach((isOnline, userId) => {
